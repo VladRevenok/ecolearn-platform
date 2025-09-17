@@ -18,6 +18,54 @@
         .tab-content {
             margin-top: 20px;
         }
+        
+        /* Темна тема */
+        body.dark-theme {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        body.dark-theme .jumbotron {
+            background-color: #2d2d2d;
+            color: #ffffff;
+        }
+        
+        body.dark-theme .panel-default {
+            background-color: #2d2d2d;
+            border-color: #444;
+        }
+        
+        body.dark-theme .panel-body {
+            background-color: #2d2d2d;
+            color: #ffffff;
+        }
+        
+        body.dark-theme .form-control {
+            background-color: #3d3d3d;
+            border-color: #555;
+            color: #ffffff;
+        }
+        
+        body.dark-theme .nav-tabs {
+            border-bottom-color: #444;
+        }
+        
+        body.dark-theme .nav-tabs > li > a {
+            color: #ffffff;
+            background-color: #2d2d2d;
+            border-color: #444;
+        }
+        
+        body.dark-theme .nav-tabs > li.active > a {
+            background-color: #1a1a1a;
+            border-color: #444;
+            color: #ffffff;
+        }
+        
+        body.dark-theme h1[style*="background-color: #8e44ad"] {
+            background-color: #b19cd9 !important;
+            color: #1a1a1a !important;
+        }
     </style>
 </head>
 <body>
@@ -71,13 +119,13 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6">
-            <h2>Об’єкт дослідження:</h2>
+            <h2>Об'єкт дослідження:</h2>
             <p style="font-size: 16px; line-height: 1.6;">Процес формування екологічної свідомості та екологічної поведінки у молоді в освітньому середовищі.</p>
         </div>
         
         <div class="col-md-6">
             <h2>Предмет дослідження:</h2>
-            <p style="font-size: 16px; line-height: 1.6;">Адаптивні методи та технології (AR, machine learning, комп’ютерний зір, гейміфікація) для створення інтерактивної освітньої екосистеми, спрямованої на розвиток екологічної відповідальності.</p>
+            <p style="font-size: 16px; line-height: 1.6;">Адаптивні методи та технології (AR, machine learning, комп'ютерний зір, гейміфікація) для створення інтерактивної освітньої екосистеми, спрямованої на розвиток екологічної відповідальності.</p>
         </div>
     </div>
 </div>
@@ -107,11 +155,10 @@
                         <h4>Відображення</h4>
                         <div class="form-group">
                             <label class="checkbox">
-                                <input type="checkbox" id="darkMode"> Темна тема
+                                <input type="checkbox" id="darkMode" onchange="toggleDarkMode()"> Темна тема
                             </label>
                         </div>
-                        
-                        <button type="button" class="btn btn-primary">Зберегти налаштування</button>
+
                     </div>
                 </div>
             </div>
@@ -122,11 +169,34 @@
 <!-- Футер -->
 <footer>
 </footer>
+
+<script>
+function toggleDarkMode() {
+    const isDarkMode = document.getElementById('darkMode').checked;
+    
+    if (isDarkMode) {
+        document.body.classList.add('dark-theme');
+        localStorage.setItem('darkMode', 'enabled');
+    } else {
+        document.body.classList.remove('dark-theme');
+        localStorage.setItem('darkMode', 'disabled');
+    }
+}
+
+// Завантаження збережених налаштувань при завантаженні сторінки
+document.addEventListener('DOMContentLoaded', function() {
+    const darkMode = localStorage.getItem('darkMode');
+    
+    if (darkMode === 'enabled') {
+        document.body.classList.add('dark-theme');
+        document.getElementById('darkMode').checked = true;
+    }
+});
+</script>
+
   <!-- jQuery -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
   <!-- Latest compiled and minified JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </body>
 </html>
-
-
