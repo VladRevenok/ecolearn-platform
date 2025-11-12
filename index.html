@@ -66,6 +66,51 @@
             background-color: #b19cd9 !important;
             color: #1a1a1a !important;
         }
+        
+        body.dark-theme .schema-block {
+            background-color: #3d3d3d !important;
+            border-color: #555 !important;
+        }
+        
+        body.dark-theme .schema-block-green {
+            background-color: #2d4a3e !important;
+            border-color: #27ae60 !important;
+        }
+        
+        body.dark-theme .schema-block-orange {
+            background-color: #4a3d2d !important;
+            border-color: #e67e22 !important;
+        }
+        
+        body.dark-theme .schema-block-blue {
+            background-color: #2d3d4a !important;
+            border-color: #3498db !important;
+        }
+        
+        /* Таблиця в темній темі */
+        body.dark-theme .table {
+            background-color: #2d2d2d !important;
+            color: #ffffff !important;
+        }
+        
+        body.dark-theme .table thead {
+            background-color: #b19cd9 !important;
+            color: #1a1a1a !important;
+        }
+        
+        body.dark-theme .table tbody td {
+            background-color: #3d3d3d !important;
+            border-color: #555 !important;
+        }
+        
+        body.dark-theme .table-bordered {
+            border-color: #555 !important;
+        }
+        
+        /* Фіолетові заголовки в темній темі */
+        body.dark-theme h2[style*="color: #8e44ad"] {
+            color: #b19cd9 !important;
+        }
     </style>
 </head>
 <body>
@@ -129,12 +174,140 @@
         </div>
     </div>
 </div>
- <!-- Секція з фото -->
-            <div class="container" style="text-align: center; margin-top: 40px; margin-bottom: 40px;">
-                <img src="https://i.ytimg.com/vi/gGhmmzlNdHY/mqdefault.jpg" alt="EcoLearn Platform" style="width: 80%; max-width: 800px; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            </div>
 
-            <hr>
+<!-- Секція проблеми екології -->
+<div class="container" style="margin-top: 40px;">
+    <h2 style="text-align: center; color: #8e44ad; margin-bottom: 20px;">Проблеми екології, які можна розв'язати у проєкті?</h2>
+    <p style="font-size: 16px; line-height: 1.8; text-align: justify;">
+        Проєкт EcoLearn AR Platform з модулем колекціонування рослин через ШІ-сканування сприяє збереженню біорізноманіття (ЦСР 15), навчаючи молодь розпізнавати та моніторити локальні види, що допомагає виявляти інвазивні рослини та деградацію екосистем. Гейміфіковані квести мотивують до участі в громадському науковому моніторингу, формуючи дані про здоров'я лісів, степів чи водойм України. Через AR-візуалізацію користувачі бачать вплив вирубки чи забруднення, що підвищує свідомість щодо зміни клімату (ЦСР 13) та сталого споживання (ЦСР 12). Зібрані анонімні дані можуть передаватися екологам для реальних проєктів відновлення.
+    </p>
+</div>
+
+<!-- Цільова аудиторія -->
+<div class="container" style="margin-top: 40px;">
+    <h2 style="text-align: center; color: #8e44ad; margin-bottom: 20px;">Цільова аудиторія проєкту</h2>
+    <div style="font-size: 16px; line-height: 1.8;">
+        <p><strong>•</strong> <strong>Підлітки 12–17 років</strong> – активні користувачі смартфонів, які люблять ігри та AR, вивчають біологію/екологію в школі та мотивовані гейміфікацією через бали, колекції та лідерборд</p>
+        
+        <p><strong>•</strong> <strong>Вчителі, класні керівники</strong> – використовують платформу як інтерактивний інструмент на уроках, створюють класові квести та отримують звіти про активність учнів</p>
+        
+        <p><strong>•</strong> <strong>Еко-активісти та молодіжні спільноти (15–20 років)</strong> – беруть участь у реальних кампаніях моніторингу інвазивних видів, експортують дані у різноманітні проєкти</p>
+        
+        <p><strong>•</strong> <strong>Батьки та шкільні адміністрації</strong> – підтримують проєкт як позакласну активність.</p>
+    </div>
+</div>
+
+<!-- Використання ШІ -->
+<div class="container" style="margin-top: 50px;">
+    <h2 style="text-align: center; color: #8e44ad; margin-bottom: 30px;">Використання ШІ: значення в системі (iNaturalist API + Hugging Face модель)</h2>
+    
+    <div class="table-responsive">
+        <table class="table table-bordered" style="background-color: white;">
+            <thead style="background-color: #8e44ad; color: white;">
+                <tr>
+                    <th style="width: 30%; padding: 15px;">ШІ-модуль</th>
+                    <th style="padding: 15px;">Значення в проєкті</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 15px; font-weight: bold; background-color: #f5f5f5;">iNaturalist API / PlantNet + HF модель</td>
+                    <td style="padding: 15px;">
+                        Розпізнає рослину з фото → додає в Еко-декс → нараховує бали → показує AR-модель з екологічними фактами. Забезпечує точність 85–95%, регіональну адаптацію (українська флора), анти-чит (GPS + community verify), генерує дані для моніторингу біорізноманіття. Без цього — немає колекціонування, немає гри, немає освіти.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Схема системи -->
+<div class="container" style="margin-top: 50px; margin-bottom: 40px;">
+    <h2 style="text-align: center; color: #8e44ad; margin-bottom: 30px;">Схема системи</h2>
+    
+    <div class="row" style="text-align: center;">
+        <!-- Блок 1 -->
+        <div class="col-md-12">
+            <div class="schema-block" style="border: 2px solid #8e44ad; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 400px; background-color: #f9f9f9;">
+                <strong>Користувач (смартфон)</strong>
+            </div>
+            <div style="font-size: 20px; margin: 10px 0;">↓</div>
+            <p style="font-size: 14px; color: #666; margin: 5px 0;">(Live фото камерою)</p>
+        </div>
+
+        <!-- Блок 2 -->
+        <div class="col-md-12">
+            <div class="schema-block" style="border: 2px solid #8e44ad; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 400px; background-color: #f9f9f9;">
+                <strong>Мобільний додаток</strong><br>
+                <span style="font-size: 14px;">(Flutter + AR Foundation)</span>
+            </div>
+            <div style="font-size: 20px; margin: 10px 0;">↓</div>
+            <p style="font-size: 14px; color: #666; margin: 5px 0;">(POST фото + GPS + час)</p>
+        </div>
+
+        <!-- Блок 3 -->
+        <div class="col-md-12">
+            <div class="schema-block" style="border: 2px solid #8e44ad; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 400px; background-color: #f9f9f9;">
+                <strong>REST API → ШІ-сервер</strong><br>
+                <span style="font-size: 14px;">(Python/FastAPI)</span>
+            </div>
+            <div style="font-size: 20px; margin: 10px 0;">↓</div>
+            <p style="font-size: 14px; color: #666; margin: 5px 0;">(iNaturalist/PlantNet API або HF модель)</p>
+        </div>
+
+        <!-- Блок 4 -->
+        <div class="col-md-12">
+            <div class="schema-block" style="border: 2px solid #8e44ad; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 500px; background-color: #f9f9f9;">
+                <strong>Обробка:</strong> розпізнавання виду → confidence → анті-чит
+            </div>
+            <div style="font-size: 20px; margin: 10px 0;">↓</div>
+            <p style="font-size: 14px; color: #666; margin: 5px 0;">(JSON: {species, rarity, location})</p>
+        </div>
+
+        <!-- Блок 5 -->
+        <div class="col-md-12">
+            <div class="schema-block" style="border: 2px solid #8e44ad; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 450px; background-color: #f9f9f9;">
+                <strong>База даних</strong><br>
+                <span style="font-size: 14px;">(Firebase / PostgreSQL)</span>
+            </div>
+            <div style="font-size: 20px; margin: 10px 0;">↙ ↘</div>
+        </div>
+
+        <!-- Блоки 6 і 7 -->
+        <div class="col-md-6">
+            <div class="schema-block-green" style="border: 2px solid #27ae60; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 300px; background-color: #e8f8f5;">
+                <strong>Колекція (Еко-декс)</strong>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="schema-block-green" style="border: 2px solid #27ae60; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 300px; background-color: #e8f8f5;">
+                <strong>Лідерборд/Квести</strong>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div style="font-size: 20px; margin: 10px 0;">↓</div>
+        </div>
+
+        <!-- Блок 8 -->
+        <div class="col-md-12">
+            <div class="schema-block-orange" style="border: 2px solid #e67e22; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 500px; background-color: #fef5e7;">
+                <strong>AR-оверлей (3D-модель + факти) + Бали/XP</strong>
+            </div>
+            <div style="font-size: 20px; margin: 10px 0;">↓</div>
+        </div>
+
+        <!-- Блок 9 -->
+        <div class="col-md-12">
+            <div class="schema-block-blue" style="border: 2px solid #3498db; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 500px; background-color: #ebf5fb;">
+                <strong>Веб-дашборд (React)</strong><br>
+                <span style="font-size: 14px;">→ спільнота, звіти, експорт</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
         </div>
 
         <!-- Вкладка "Налаштування" -->
@@ -176,21 +349,14 @@ function toggleDarkMode() {
     
     if (isDarkMode) {
         document.body.classList.add('dark-theme');
-        localStorage.setItem('darkMode', 'enabled');
     } else {
         document.body.classList.remove('dark-theme');
-        localStorage.setItem('darkMode', 'disabled');
     }
 }
 
 // Завантаження збережених налаштувань при завантаженні сторінки
 document.addEventListener('DOMContentLoaded', function() {
-    const darkMode = localStorage.getItem('darkMode');
-    
-    if (darkMode === 'enabled') {
-        document.body.classList.add('dark-theme');
-        document.getElementById('darkMode').checked = true;
-    }
+    // Видалено використання localStorage відповідно до обмежень
 });
 </script>
 
