@@ -1,374 +1,403 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>EcoLearn</title>
+import streamlit as st
+import requests
+from PIL import Image
+import io
+import base64
+from typing import Dict, List
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Latest compiled and minified CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+# ==============
+# Налаштування сторінки
+# ==============
+st.set_page_config(page_title="Plant Identifier - 3 API", layout="centered")
+st.title("🌿 Plant Identifier - Три API")
 
-  <!-- Optional theme -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-  <style>
-        .navbar-custom {
-            background-color: #8e44ad;
-            border-color: #8e44ad;
-        }
-        .tab-content {
-            margin-top: 20px;
-        }
-        
-        /* Темна тема */
-        body.dark-theme {
-            background-color: #1a1a1a;
-            color: #ffffff;
-        }
-        
-        body.dark-theme .jumbotron {
-            background-color: #2d2d2d;
-            color: #ffffff;
-        }
-        
-        body.dark-theme .panel-default {
-            background-color: #2d2d2d;
-            border-color: #444;
-        }
-        
-        body.dark-theme .panel-body {
-            background-color: #2d2d2d;
-            color: #ffffff;
-        }
-        
-        body.dark-theme .form-control {
-            background-color: #3d3d3d;
-            border-color: #555;
-            color: #ffffff;
-        }
-        
-        body.dark-theme .nav-tabs {
-            border-bottom-color: #444;
-        }
-        
-        body.dark-theme .nav-tabs > li > a {
-            color: #ffffff;
-            background-color: #2d2d2d;
-            border-color: #444;
-        }
-        
-        body.dark-theme .nav-tabs > li.active > a {
-            background-color: #1a1a1a;
-            border-color: #444;
-            color: #ffffff;
-        }
-        
-        body.dark-theme h1[style*="background-color: #8e44ad"] {
-            background-color: #b19cd9 !important;
-            color: #1a1a1a !important;
-        }
-        
-        body.dark-theme .schema-block {
-            background-color: #3d3d3d !important;
-            border-color: #555 !important;
-        }
-        
-        body.dark-theme .schema-block-green {
-            background-color: #2d4a3e !important;
-            border-color: #27ae60 !important;
-        }
-        
-        body.dark-theme .schema-block-orange {
-            background-color: #4a3d2d !important;
-            border-color: #e67e22 !important;
-        }
-        
-        body.dark-theme .schema-block-blue {
-            background-color: #2d3d4a !important;
-            border-color: #3498db !important;
-        }
-        
-        /* Таблиця в темній темі */
-        body.dark-theme .table {
-            background-color: #2d2d2d !important;
-            color: #ffffff !important;
-        }
-        
-        body.dark-theme .table thead {
-            background-color: #b19cd9 !important;
-            color: #1a1a1a !important;
-        }
-        
-        body.dark-theme .table tbody td {
-            background-color: #3d3d3d !important;
-            border-color: #555 !important;
-        }
-        
-        body.dark-theme .table-bordered {
-            border-color: #555 !important;
-        }
-        
-        /* Фіолетові заголовки в темній темі */
-        body.dark-theme h2[style*="color: #8e44ad"] {
-            color: #b19cd9 !important;
-        }
-    </style>
-</head>
-<body>
-<!-- Навігаційна панель -->
-<div class="navbar navbar-inverse navbar-fixed-top navbar-custom">
-    <div class="container">
-        <div class="navbar-header">
-            <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">EcoLearn</a>
-        </div>
-        <div class="navbar-collapse collapse">
-        </div>
-    </div>
-</div>
+# -------------------------------
+# API KEYS
+# -------------------------------
+PLANTNET_KEY = "2b105FYLbg34pvfXRESKZMMKO"
+PLANTID_KEY = "HxlpPMRKG5HxLVhO9ug43DXFQfJ6LsLF6T4TKj9BCuyWVKzhmJ"
+PERENUAL_KEY = "sk-oQbZ693ec348b4aa213954"  # <<< Отримай на https://perenual.com/docs/api
 
-<!-- Вкладки -->
-<div class="container" style="margin-top: 80px;">
-    <ul class="nav nav-tabs">
-        <li><a href="#about" data-toggle="tab">Про мене</a></li>
-        <li class="active"><a href="#home" data-toggle="tab">EcoLearn</a></li>
-        <li><a href="#settings" data-toggle="tab">Налаштування</a></li>
-    </ul>
-
-    <div class="tab-content">
-        <!-- Вкладка "Про мене" -->
-        <div class="tab-pane" id="about">
-            <div class="jumbotron" style="text-align: center;">
-                <div class="container">
-                    <h1>Про мене</h1>
-                    <p>Вітаю! Мене звати Влад, я учень 10-А класу, і я розробник EcoLearn AR Platform - інноваційної платформи для екологічної освіти. Моя мета - створити інтерактивні інструменти для навчання та підвищення екологічної свідомості серед молоді.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Головна вкладка EcoLearn -->
-        <div class="tab-pane active" id="home">
-
-<!-- Джамботрон -->
-<div class="jumbotron" style="text-align: center;">
-    <div class="container">
-        <h1 style="background-color: #8e44ad; color: white; padding: 20px; border-radius: 10px; display: inline-block;">EcoLearn AR Platform</h1>
-        <p>EcoLearn AR Platform: інноваційна адаптивна освітня екосистема з гейміфікацією та доповненою реальністю для формування екологічної свідомості молоді</p>
-    </div>
-</div>
-
-<!-- Основний контент -->
-<div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <h2>Об'єкт дослідження:</h2>
-            <p style="font-size: 16px; line-height: 1.6;">Процес формування екологічної свідомості та екологічної поведінки у молоді в освітньому середовищі.</p>
-        </div>
+# -------------------------------
+# 1. PlantNet API
+# -------------------------------
+def identify_plantnet(image_bytes):
+    """PlantNet API"""
+    try:
+        files = [("images", ("image.jpg", image_bytes, "image/jpeg"))]
+        params = {"api-key": PLANTNET_KEY}
         
-        <div class="col-md-6">
-            <h2>Предмет дослідження:</h2>
-            <p style="font-size: 16px; line-height: 1.6;">Адаптивні методи та технології (AR, machine learning, комп'ютерний зір, гейміфікація) для створення інтерактивної освітньої екосистеми, спрямованої на розвиток екологічної відповідальності.</p>
-        </div>
-    </div>
-</div>
-
-<!-- Секція проблеми екології -->
-<div class="container" style="margin-top: 40px;">
-    <h2 style="text-align: center; color: #8e44ad; margin-bottom: 20px;">Проблеми екології, які можна розв'язати у проєкті?</h2>
-    <p style="font-size: 16px; line-height: 1.8; text-align: justify;">
-        Проєкт EcoLearn AR Platform з модулем колекціонування рослин через ШІ-сканування сприяє збереженню біорізноманіття (ЦСР 15), навчаючи молодь розпізнавати та моніторити локальні види, що допомагає виявляти інвазивні рослини та деградацію екосистем. Гейміфіковані квести мотивують до участі в громадському науковому моніторингу, формуючи дані про здоров'я лісів, степів чи водойм України. Через AR-візуалізацію користувачі бачать вплив вирубки чи забруднення, що підвищує свідомість щодо зміни клімату (ЦСР 13) та сталого споживання (ЦСР 12). Зібрані анонімні дані можуть передаватися екологам для реальних проєктів відновлення.
-    </p>
-</div>
-
-<!-- Цільова аудиторія -->
-<div class="container" style="margin-top: 40px;">
-    <h2 style="text-align: center; color: #8e44ad; margin-bottom: 20px;">Цільова аудиторія проєкту</h2>
-    <div style="font-size: 16px; line-height: 1.8;">
-        <p><strong>•</strong> <strong>Підлітки 12–17 років</strong> – активні користувачі смартфонів, які люблять ігри та AR, вивчають біологію/екологію в школі та мотивовані гейміфікацією через бали, колекції та лідерборд</p>
+        resp = requests.post(
+            "https://my-api.plantnet.org/v2/identify/all",
+            files=files,
+            params=params,
+            timeout=30
+        )
         
-        <p><strong>•</strong> <strong>Вчителі, класні керівники</strong> – використовують платформу як інтерактивний інструмент на уроках, створюють класові квести та отримують звіти про активність учнів</p>
+        if resp.status_code != 200:
+            return {"error": f"Помилка HTTP {resp.status_code}"}
         
-        <p><strong>•</strong> <strong>Еко-активісти та молодіжні спільноти (15–20 років)</strong> – беруть участь у реальних кампаніях моніторингу інвазивних видів, експортують дані у різноманітні проєкти</p>
+        data = resp.json()
+        results = []
         
-        <p><strong>•</strong> <strong>Батьки та шкільні адміністрації</strong> – підтримують проєкт як позакласну активність.</p>
-    </div>
-</div>
-
-<!-- Використання ШІ -->
-<div class="container" style="margin-top: 50px;">
-    <h2 style="text-align: center; color: #8e44ad; margin-bottom: 30px;">Використання ШІ: значення в системі (iNaturalist API + Hugging Face модель)</h2>
+        for item in data.get("results", [])[:5]:
+            species = item.get("species", {})
+            name = species.get("scientificNameWithoutAuthor") or species.get("scientificName", "Невідомо")
+            common = species.get("commonNames", [])
+            common_name = common[0] if common else ""
+            score = item.get("score", 0.0)
+            
+            results.append({
+                "name": name,
+                "common_name": common_name,
+                "score": score
+            })
+        
+        return {"results": results, "success": True}
     
-    <div class="table-responsive">
-        <table class="table table-bordered" style="background-color: white;">
-            <thead style="background-color: #8e44ad; color: white;">
-                <tr>
-                    <th style="width: 30%; padding: 15px;">ШІ-модуль</th>
-                    <th style="padding: 15px;">Значення в проєкті</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="padding: 15px; font-weight: bold; background-color: #f5f5f5;">iNaturalist API / PlantNet + HF модель</td>
-                    <td style="padding: 15px;">
-                        Розпізнає рослину з фото → додає в Еко-декс → нараховує бали → показує AR-модель з екологічними фактами. Забезпечує точність 85–95%, регіональну адаптацію (українська флора), анти-чит (GPS + community verify), генерує дані для моніторингу біорізноманіття. Без цього — немає колекціонування, немає гри, немає освіти.
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+    except Exception as e:
+        return {"error": str(e)}
 
-<!-- Схема системи -->
-<div class="container" style="margin-top: 50px; margin-bottom: 40px;">
-    <h2 style="text-align: center; color: #8e44ad; margin-bottom: 30px;">Схема системи</h2>
+# -------------------------------
+# 2. Plant.id (Kindwise) API
+# -------------------------------
+def identify_plantid(image_bytes):
+    """Plant.id API"""
+    try:
+        base64_image = base64.b64encode(image_bytes).decode('utf-8')
+        
+        headers = {
+            "Content-Type": "application/json",
+            "Api-Key": PLANTID_KEY
+        }
+        
+        data = {
+            "images": [base64_image],
+            "modifiers": ["similar_images"],
+            "plant_details": ["common_names", "taxonomy"]
+        }
+        
+        resp = requests.post(
+            "https://api.plant.id/v2/identify",
+            json=data,
+            headers=headers,
+            timeout=30
+        )
+        
+        if resp.status_code == 429:
+            return {"error": "Перевищено ліміт запитів (100/місяць)"}
+        
+        if resp.status_code != 200:
+            return {"error": f"Помилка HTTP {resp.status_code}"}
+        
+        result = resp.json()
+        suggestions = result.get("suggestions", [])[:5]
+        
+        results = []
+        for item in suggestions:
+            name = item.get("plant_name", "Невідомо")
+            probability = item.get("probability", 0.0)
+            common = item.get("plant_details", {}).get("common_names", [])
+            common_name = common[0] if common else ""
+            
+            results.append({
+                "name": name,
+                "common_name": common_name,
+                "score": probability
+            })
+        
+        return {"results": results, "success": True}
     
-    <div class="row" style="text-align: center;">
-        <!-- Блок 1 -->
-        <div class="col-md-12">
-            <div class="schema-block" style="border: 2px solid #8e44ad; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 400px; background-color: #f9f9f9;">
-                <strong>Користувач (смартфон)</strong>
-            </div>
-            <div style="font-size: 20px; margin: 10px 0;">↓</div>
-            <p style="font-size: 14px; color: #666; margin: 5px 0;">(Live фото камерою)</p>
-        </div>
+    except Exception as e:
+        return {"error": str(e)}
 
-        <!-- Блок 2 -->
-        <div class="col-md-12">
-            <div class="schema-block" style="border: 2px solid #8e44ad; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 400px; background-color: #f9f9f9;">
-                <strong>Мобільний додаток</strong><br>
-                <span style="font-size: 14px;">(Flutter + AR Foundation)</span>
-            </div>
-            <div style="font-size: 20px; margin: 10px 0;">↓</div>
-            <p style="font-size: 14px; color: #666; margin: 5px 0;">(POST фото + GPS + час)</p>
-        </div>
-
-        <!-- Блок 3 -->
-        <div class="col-md-12">
-            <div class="schema-block" style="border: 2px solid #8e44ad; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 400px; background-color: #f9f9f9;">
-                <strong>REST API → ШІ-сервер</strong><br>
-                <span style="font-size: 14px;">(Python/FastAPI)</span>
-            </div>
-            <div style="font-size: 20px; margin: 10px 0;">↓</div>
-            <p style="font-size: 14px; color: #666; margin: 5px 0;">(iNaturalist/PlantNet API або HF модель)</p>
-        </div>
-
-        <!-- Блок 4 -->
-        <div class="col-md-12">
-            <div class="schema-block" style="border: 2px solid #8e44ad; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 500px; background-color: #f9f9f9;">
-                <strong>Обробка:</strong> розпізнавання виду → confidence → анті-чит
-            </div>
-            <div style="font-size: 20px; margin: 10px 0;">↓</div>
-            <p style="font-size: 14px; color: #666; margin: 5px 0;">(JSON: {species, rarity, location})</p>
-        </div>
-
-        <!-- Блок 5 -->
-        <div class="col-md-12">
-            <div class="schema-block" style="border: 2px solid #8e44ad; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 450px; background-color: #f9f9f9;">
-                <strong>База даних</strong><br>
-                <span style="font-size: 14px;">(Firebase / PostgreSQL)</span>
-            </div>
-            <div style="font-size: 20px; margin: 10px 0;">↙ ↘</div>
-        </div>
-
-        <!-- Блоки 6 і 7 -->
-        <div class="col-md-6">
-            <div class="schema-block-green" style="border: 2px solid #27ae60; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 300px; background-color: #e8f8f5;">
-                <strong>Колекція (Еко-декс)</strong>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="schema-block-green" style="border: 2px solid #27ae60; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 300px; background-color: #e8f8f5;">
-                <strong>Лідерборд/Квести</strong>
-            </div>
-        </div>
-
-        <div class="col-md-12">
-            <div style="font-size: 20px; margin: 10px 0;">↓</div>
-        </div>
-
-        <!-- Блок 8 -->
-        <div class="col-md-12">
-            <div class="schema-block-orange" style="border: 2px solid #e67e22; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 500px; background-color: #fef5e7;">
-                <strong>AR-оверлей (3D-модель + факти) + Бали/XP</strong>
-            </div>
-            <div style="font-size: 20px; margin: 10px 0;">↓</div>
-        </div>
-
-        <!-- Блок 9 -->
-        <div class="col-md-12">
-            <div class="schema-block-blue" style="border: 2px solid #3498db; border-radius: 10px; padding: 15px; margin: 10px auto; max-width: 500px; background-color: #ebf5fb;">
-                <strong>Веб-дашборд (React)</strong><br>
-                <span style="font-size: 14px;">→ спільнота, звіти, експорт</span>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Посилання на документ -->
-<div class="container" style="margin-top: 40px; margin-bottom: 40px; text-align: center;">
-    <a href="https://docs.google.com/document/d/1upZ-T93w67rxs-5CZxAymZ_EtQDOYqIbnp5x7BubWm4/edit?tab=t.0" target="_blank" class="btn btn-primary btn-lg" style="background-color: #8e44ad; border-color: #8e44ad; padding: 15px 30px;">
-        <span class="glyphicon glyphicon-file" style="margin-right: 10px;"></span>Посилання на документ
-    </a>
-</div>
-
-        </div>
-
-        <!-- Вкладка "Налаштування" -->
-        <div class="tab-pane" id="settings">
-            <div class="container">
-                <h2>Налаштування</h2>
-                <br>
-                
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <h4>Аудіо налаштування</h4>
-                        <div class="form-group">
-                            <label class="checkbox">
-                                <input type="checkbox" id="soundToggle" checked> Увімкнути звук
-                            </label>
-                        </div>
-                        
-                        <h4>Відображення</h4>
-                        <div class="form-group">
-                            <label class="checkbox">
-                                <input type="checkbox" id="darkMode" onchange="toggleDarkMode()"> Темна тема
-                            </label>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Футер -->
-<footer>
-</footer>
-
-<script>
-function toggleDarkMode() {
-    const isDarkMode = document.getElementById('darkMode').checked;
+# -------------------------------
+# 3. Perenual API
+# -------------------------------
+def identify_perenual(image_bytes):
+    """Perenual Plant ID API"""
     
-    if (isDarkMode) {
-        document.body.classList.add('dark-theme');
-    } else {
-        document.body.classList.remove('dark-theme');
+    if not PERENUAL_KEY:
+        return {"error": "API ключ не налаштований. Отримай на https://perenual.com/docs/api"}
+    
+    try:
+        # Конвертуємо зображення в base64
+        base64_image = base64.b64encode(image_bytes).decode('utf-8')
+        
+        # Perenual Identification API endpoint
+        url = "https://perenual.com/api/v1/identify"
+        
+        # Формат запиту (можна відправити або URL, або base64)
+        # Спробуємо multipart/form-data як у PlantNet
+        files = {
+            'image': ('plant.jpg', image_bytes, 'image/jpeg')
+        }
+        
+        params = {
+            'key': PERENUAL_KEY
+        }
+        
+        resp = requests.post(
+            url,
+            files=files,
+            params=params,
+            timeout=30
+        )
+        
+        if resp.status_code == 401:
+            return {"error": "Неправильний API ключ або немає доступу до Identification API. Приєднайся до waitlist на https://perenual.com/docs/identify/api"}
+        
+        if resp.status_code == 429:
+            return {"error": "Перевищено ліміт (100 запитів/день у безкоштовній версії)"}
+        
+        if resp.status_code != 200:
+            return {"error": f"Помилка HTTP {resp.status_code}. Можливо API ще в waitlist - спробуй запросити доступ"}
+        
+        data = resp.json()
+        
+        # Обробка результатів Perenual
+        results_list = data.get("results", [])
+        
+        if not results_list:
+            return {"error": "Не знайдено результатів"}
+        
+        results = []
+        for item in results_list[:5]:
+            name = item.get("scientific_name", item.get("name", "Невідомо"))
+            score = item.get("score", 0.0)
+            
+            # Perenual може давати links до деталей
+            resources = item.get("resources", {})
+            
+            results.append({
+                "name": name,
+                "common_name": "",
+                "score": score
+            })
+        
+        return {"results": results, "success": True}
+    
+    except Exception as e:
+        return {"error": f"Perenual помилка: {str(e)}"}
+
+# -------------------------------
+# Функція: показати горизонтальні кольорові блоки
+# -------------------------------
+def show_color_bars(results: List[Dict], api_name: str, color_scheme: str):
+    """Відображення результатів у вигляді кольорових барів"""
+    
+    if len(results) == 0:
+        st.info(f"**{api_name}**: Немає результатів")
+        return
+    
+    color_palettes = {
+        "blue": ["#0d47a1", "#1565c0", "#1e88e5", "#2196f3", "#42a5f5"],
+        "green": ["#1b5e20", "#2e7d32", "#388e3c", "#43a047", "#66bb6a"],
+        "purple": ["#4a148c", "#6a1b9a", "#7b1fa2", "#8e24aa", "#9c27b0"]
     }
-}
+    
+    colors = color_palettes.get(color_scheme, color_palettes["blue"])
+    max_score = max([r["score"] for r in results]) or 1.0
+    
+    st.markdown(f"### {api_name}")
+    
+    for i, r in enumerate(results):
+        name = r["name"]
+        common_name = r.get("common_name", "")
+        score = r["score"]
+        width_pct = (score / max_score) * 90
+        color = colors[i % len(colors)]
+        
+        display_name = f"{name}" + (f" ({common_name})" if common_name else "")
+        
+        html = f"""
+        <div style="
+            display:flex;
+            align-items:center;
+            margin-bottom:10px;
+            gap:12px;
+        ">
+            <div style="
+                background:{color};
+                width:{width_pct}%;
+                min-width:100px;
+                padding:12px 16px;
+                border-radius:8px;
+                color:white;
+                font-weight:600;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                font-size:14px;
+            ">
+                {display_name}
+            </div>
+            <div style="min-width:70px; color:#90a4ae; font-weight:600; font-size:16px;">
+                {score*100:.1f}%
+            </div>
+        </div>
+        """
+        st.markdown(html, unsafe_allow_html=True)
+    
+    st.markdown("---")
 
-// Завантаження збережених налаштувань при завантаженні сторінки
-document.addEventListener('DOMContentLoaded', function() {
-    // Видалено використання localStorage відповідно до обмежень
-});
-</script>
+# -------------------------------
+# Функція: визначити найточніший результат
+# -------------------------------
+def show_best_result(all_results: Dict):
+    """Показати API з найвищим score"""
+    
+    # Збираємо топові результати від кожного API
+    top_scores = {}
+    
+    for api_name, data in all_results.items():
+        if data.get("success") and data.get("results"):
+            top = data["results"][0]
+            top_scores[api_name] = {
+                "name": top["name"],
+                "score": top["score"],
+                "common_name": top.get("common_name", "")
+            }
+    
+    if not top_scores:
+        st.warning("❌ Жоден API не повернув результатів")
+        return
+    
+    # Знаходимо API з найвищим score
+    best_api = max(top_scores.items(), key=lambda x: x[1]["score"])
+    api_name = best_api[0]
+    plant_data = best_api[1]
+    
+    st.markdown("---")
+    st.header("🏆 Найточніший результат")
+    
+    # Іконки для API
+    api_icons = {
+        "PlantNet": "🌿",
+        "Plant.id": "🤖",
+        "Perenual": "🌱"
+    }
+    
+    icon = api_icons.get(api_name, "🎯")
+    display_name = f"{plant_data['name']}" + (f" ({plant_data['common_name']})" if plant_data['common_name'] else "")
+    
+    # Красива плашка з переможцем
+    html = f"""
+    <div style="
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        text-align: center;
+        margin-bottom: 20px;
+    ">
+        <div style="font-size: 48px; margin-bottom: 10px;">
+            {icon}
+        </div>
+        <div style="color: white; font-size: 24px; font-weight: 700; margin-bottom: 8px;">
+            {api_name}
+        </div>
+        <div style="color: #f0f0f0; font-size: 18px; margin-bottom: 5px;">
+            {display_name}
+        </div>
+        <div style="
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 10px;
+        ">
+            {plant_data['score']*100:.1f}% впевненості
+        </div>
+    </div>
+    """
+    
+    st.markdown(html, unsafe_allow_html=True)
+    
+    # Показати порівняння всіх API
+    st.subheader("📊 Порівняння всіх API")
+    
+    cols = st.columns(len(top_scores))
+    for i, (api, plant) in enumerate(top_scores.items()):
+        with cols[i]:
+            is_best = api == api_name
+            border = "3px solid #667eea" if is_best else "1px solid #ddd"
+            
+            html_card = f"""
+            <div style="
+                border: {border};
+                border-radius: 10px;
+                padding: 15px;
+                background: {'#f8f9ff' if is_best else 'white'};
+                text-align: center;
+            ">
+                <div style="font-size: 32px; margin-bottom: 5px;">
+                    {api_icons.get(api, '🎯')}
+                </div>
+                <div style="font-weight: 700; font-size: 14px; margin-bottom: 5px; color: #333;">
+                    {api}
+                </div>
+                <div style="font-size: 20px; font-weight: 700; color: #667eea;">
+                    {plant['score']*100:.0f}%
+                </div>
+                <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                    {plant['name'].split()[0] if plant['name'] != "Невідомо" else "❓"}
+                </div>
+            </div>
+            """
+            st.markdown(html_card, unsafe_allow_html=True)
 
-  <!-- jQuery -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-  <!-- Latest compiled and minified JavaScript -->
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-</body>
-</html>
+# -------------------------------
+# ГОЛОВНИЙ ІНТЕРФЕЙС
+# -------------------------------
+
+uploaded = st.file_uploader("Завантаж фото рослини (jpg, png, jpeg):", type=["jpg","jpeg","png"])
+
+if uploaded:
+    # Показати оригінал
+    img = Image.open(uploaded).convert("RGB")
+    st.image(img, caption="Завантажене фото", use_container_width=True)
+    
+    # Отримати байти
+    buffered = io.BytesIO()
+    img.save(buffered, format="JPEG")
+    img_bytes = buffered.getvalue()
+    
+    st.markdown("---")
+    st.header("🔍 Результати розпізнавання")
+    
+    all_results = {}
+    
+    # PlantNet
+    with st.spinner("PlantNet розпізнає..."):
+        result1 = identify_plantnet(img_bytes)
+        all_results["PlantNet"] = result1
+        
+        if result1.get("success"):
+            show_color_bars(result1["results"], "🌿 PlantNet", "blue")
+        else:
+            st.error(f"**PlantNet**: {result1.get('error', 'Помилка')}")
+    
+    # Plant.id
+    with st.spinner("Plant.id розпізнає..."):
+        result2 = identify_plantid(img_bytes)
+        all_results["Plant.id"] = result2
+        
+        if result2.get("success"):
+            show_color_bars(result2["results"], "🤖 Plant.id (AI)", "green")
+        else:
+            st.warning(f"**Plant.id**: {result2.get('error', 'Помилка')}")
+    
+    # Perenual
+    with st.spinner("Perenual розпізнає..."):
+        result3 = identify_perenual(img_bytes)
+        all_results["Perenual"] = result3
+        
+        if result3.get("success"):
+            show_color_bars(result3["results"], "🌱 Perenual", "purple")
+        else:
+            st.warning(f"**Perenual**: {result3.get('error', 'Помилка')}")
+    
+    # Показати найточніший результат
+    show_best_result(all_results)
